@@ -1,12 +1,12 @@
 from typing import get_args
-from flask import Flask, request
-from flask.templating import render_template
+from flask import Flask, jsonify
+
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
-    return render_template("index.html")
+    return jsonify({"about":"hello world"})
 
 if __name__ == "__main__":
     app.run(debug=True)
