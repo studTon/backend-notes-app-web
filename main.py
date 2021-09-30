@@ -1,8 +1,8 @@
-from flask import Flask, jsonify, render_template
-from flask.globals import request
-from data import json_object
+from flask import Flask, jsonify, render_template, Response, request
+from flask_sqlalchemy import SQLAlchemy
+import requests, json, mysql.connector
 
-
+resposta = 0
 app = Flask(__name__)
 @app.route('/anotacoes')
 def delete():
@@ -10,25 +10,35 @@ def delete():
 @app.route('/', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def hello():
     return 'hello world'
-'''class nota():
-    def __init__(self) -> None:
-        pass;
-        self.title = request.form['title']
-        self.id = request.form['id']
-        self.date = request.form['date']
-        self.description = request.form['description']'''
 
 @app.route('/get', methods=['GET'])
 def criar_nota():
-    return render_template('template.html')
-@app.route('/post/<data>', methods=['POST'])
-def editar_nota(data):
-    return jsonify({
-        'title': data,
-        'date': 2021,
-        'description': 'Ok',
-        'id': 0
-    })
+    resposta = requests.get()
+    return resposta
+@app.route('/post', methods=['POST'])
+def salvar_nota():
+    resposta = requests.post()
+
+@app.route('/put', methods=['PUT'])
+def editar_nota():
+    resposta = requests.put()
+
+@app.route('/delete', methods=['DELETE'])
+def excluir_nota():
+    resposta = requests.delete()
+
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost'
+
+db = SQLAlchemy(app)
+
+class Note(db.Model):
+    title = db.Column(db.String(50), primary_key=True)
+    description = db.Column(db.String(100))
+    id = db.Column(db.Integer)
+    #date = db.Column(db.Date)
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)
