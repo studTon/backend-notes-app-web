@@ -1,44 +1,40 @@
-from flask import Flask, jsonify, render_template, Response, request
+from flask import Flask, jsonify, render_template, Response
+from requests.api import post, request
+from flask_restful import Api, Resource, abort, reqparse, fields, marshal_with
 from flask_sqlalchemy import SQLAlchemy
-import requests, json, mysql.connector
+import json, mysql.connector
 
 resposta = 0
 app = Flask(__name__)
-@app.route('/anotacoes')
-def delete():
-    return delete
-@app.route('/', methods=['GET', 'POST', 'PUT', 'DELETE'])
-def hello():
-    return 'hello world'
-
-@app.route('/get', methods=['GET'])
-def criar_nota():
-    resposta = requests.get()
-    return resposta
-@app.route('/post', methods=['POST'])
-def salvar_nota():
-    resposta = requests.post()
-
-@app.route('/put', methods=['PUT'])
-def editar_nota():
-    resposta = requests.put()
-
-@app.route('/delete', methods=['DELETE'])
-def excluir_nota():
-    resposta = requests.delete()
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
 
 db = SQLAlchemy(app)
 
-class Note(db.Model):
-    title = db.Column(db.String(50), primary_key=True)
-    description = db.Column(db.String(100))
-    id = db.Column(db.Integer)
-    #date = db.Column(db.Date)
+class Nota(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(80), nullable=False)
+    description = db.Column(db.String(100), nullable=False)
+    text = db.Column(db.Text, nullable=True)
 
+@app.route('/', methods=['GET', 'POST', 'PUT', 'DELETE'])
+def hello():
+    return 'Hello World!'
 
+@app.route('/nota/<id>', methods=['GET'])
+def selecionar_nota():
+
+@app.route('/nota', methods=['POST'])
+def criar_nota():
+args = nota.parse_args()
+@app.route('/nota/<id>', methods=['PUT'])
+def editar_nota():
+    
+
+@app.route('/nota/<id>', methods=['DELETE'])
+def excluir_nota():
+    
 
 if __name__ == "__main__":
     app.run(debug=True)
