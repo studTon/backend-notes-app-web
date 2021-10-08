@@ -16,8 +16,18 @@ class Nota(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(80), nullable=False)
     description = db.Column(db.String(100), nullable=False)
-    text = db.Column(db.Text, nullable=True)
+    date = db.Column(db.String(20), nullable=True)
 
+
+note_post_args = reqparse.RequestParser()
+note_post_args.add_argument('title', type=str, help='Title is required', required=True)
+note_post_args.add_argument('description', type=str, required=False)
+note_post_args.add_argument('date', type=str, required=True)
+
+note_put_args = reqparse.RequestParser()
+note_put_args.add_argument('title', type=str, help='Title is required', required=True)
+note_put_args.add_argument('description', type=str, required=False)
+note_put_args.add_argument('date', type=str, required=True)
 
 @app.route('/', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def hello():
