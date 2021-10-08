@@ -18,23 +18,34 @@ class Nota(db.Model):
     description = db.Column(db.String(100), nullable=False)
     date = db.Column(db.String(20), nullable=True)
 
+db.create_all()
 
 note_post_args = reqparse.RequestParser()
 note_post_args.add_argument('title', type=str, help='Title is required', required=True)
 note_post_args.add_argument('description', type=str, required=False)
-note_post_args.add_argument('date', type=str, required=True)
+note_post_args.add_argument('date', type=str, required=False)
 
 note_put_args = reqparse.RequestParser()
 note_put_args.add_argument('title', type=str, help='Title is required', required=True)
 note_put_args.add_argument('description', type=str, required=False)
-note_put_args.add_argument('date', type=str, required=True)
+note_put_args.add_argument('date', type=str, required=False)
 
+resource_fields = {
+    'id': fields.Integer,
+    'title': fields.String,
+    'description': fields.String,
+    'date':fields.String
+}
+@app.route('/note/all', methods=['GET'])
+def all_notes():
+    return jsonify(db)
 @app.route('/note/<id>', methods=['GET'])
-def select_note():
-    return
+def select_note(id):
+    return id, 201
 @app.route('/note', methods=['POST'])
-def create_note():
-    return
+def create_note(title, description, date):
+    args = note_post_args.parse_args()
+    return {"title":args['title'], "description":args['description'], "date":args['date']}
 @app.route('/note/<id>', methods=['PUT'])
 def edit_note():
     return
