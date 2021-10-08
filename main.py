@@ -29,22 +29,18 @@ note_put_args.add_argument('title', type=str, help='Title is required', required
 note_put_args.add_argument('description', type=str, required=False)
 note_put_args.add_argument('date', type=str, required=True)
 
-@app.route('/', methods=['GET', 'POST', 'PUT', 'DELETE'])
-def hello():
-    return 'Hello World!'
-
-@app.route('/nota/<id>', methods=['GET'])
-def selecionar_nota():
+@app.route('/note/<id>', methods=['GET'])
+def select_note():
     return
-@app.route('/nota', methods=['POST'])
-def criar_nota():
+@app.route('/note', methods=['POST'])
+def create_note():
     return
-@app.route('/nota/<id>', methods=['PUT'])
-def editar_nota():
+@app.route('/note/<id>', methods=['PUT'])
+def edit_note():
     return
 
-@app.route('/nota/<id>', methods=['DELETE'])
-def excluir_nota():
+@app.route('/note/<id>', methods=['DELETE'])
+def delete_note():
     return
 
 if __name__ == "__main__":
