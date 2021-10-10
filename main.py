@@ -1,8 +1,5 @@
 from flask import Flask, jsonify, request, make_response
-from flask_restful import Api
-from flask_sqlalchemy import SQLAlchemy
 import dataset
-from sqlalchemy.ext.declarative import api
 
 
 app = Flask(__name__)
