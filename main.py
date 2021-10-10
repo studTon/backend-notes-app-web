@@ -6,7 +6,7 @@ app = Flask(__name__)
 CORS(app)
 db = dataset.connect('sqlite:///data.db')
 
-table = db['notes']
+table = db.get_table('notes', primary_id='id', primary_type=db.types.integer)
 
 def fetch_db(note_id):
     return table.find_one(id=note_id)
@@ -20,13 +20,11 @@ def fetch_db_all():
 @app.route('/populate', methods=['GET'])
 def populate():
     table.insert({
-        "id": "1",
         "title": "A Song of Ice and Fire",
         "description": "A good old book",
         "date": "Out 9 2021"
     })
     table.insert({
-        "id": "2",
         "title": "Food",
         "description": "Pizza",
         "date": "Out 8 2021"
@@ -39,8 +37,8 @@ def notes():
         return make_response(jsonify(fetch_db_all()),200)
     elif request.method == "POST":
         content = request.json
-        note_id = content['id']
         table.insert(content)
+        note_id = content['id']
         return make_response(jsonify(fetch_db(note_id)), 201)
 
 @app.route('/notes/<note_id>', methods=['GET', 'PUT', 'DELETE'])    
