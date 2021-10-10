@@ -1,66 +1,69 @@
-from flask import Flask, jsonify, render_template, Response
-from requests.api import post, request
-from flask_restful import Api, Resource, abort, reqparse, fields, marshal_with
+from flask import Flask, jsonify, request, make_response
+from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
-import json, mysql.connector
+import dataset
 from sqlalchemy.ext.declarative import api
 
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
+db = dataset.connect('sqlite:///data.db')
 
-db = SQLAlchemy(app)
+table = db['notes']
 
-class Note(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(80), nullable=False)
-    description = db.Column(db.String(100), nullable=False)
-    date = db.Column(db.String(20), nullable=True)
+def fetch_db(note_id):
+    return table.find_one(id=note_id)
 
-db.create_all()
+def fetch_db_all():
+    notes = []
+    for note in table:
+        notes.append(note)
+    return notes
 
-note_post_args = reqparse.RequestParser()
-note_post_args.add_argument('title', type=str, help='Title is required', required=True)
-note_post_args.add_argument('description', type=str, required=False)
-note_post_args.add_argument('date', type=str, required=False)
+@app.route('/populate', methods=['GET'])
+def populate():
+    table.insert({
+        "id": "1",
+        "title": "A Song of Ice and Fire",
+        "description": "A good old book",
+        "date": "Out 9 2021"
+    })
+    table.insert({
+        "id": "2",
+        "title": "Food",
+        "description": "Pizza",
+        "date": "Out 8 2021"
+    })
+    return make_response(jsonify(fetch_db_all()),200)
 
-note_put_args = reqparse.RequestParser()
-note_put_args.add_argument('title', type=str, help='Title is required', required=True)
-note_put_args.add_argument('description', type=str, required=False)
-note_put_args.add_argument('date', type=str, required=False)
+@app.route('/notes', methods=['GET', 'POST'])
+def notes():
+    if request.method == "GET":
+        return make_response(jsonify(fetch_db_all()),200)
+    elif request.method == "POST":
+        content = request.json
+        note_id = content['id']
+        table.insert(content)
+        return make_response(jsonify(fetch_db(note_id)), 201)
 
-resource_fields = {
-    'id': fields.Integer,
-    'title': fields.String,
-    'description': fields.String,
-    'date':fields.String
-}
+@app.route('/notes/<note_id>', methods=['GET', 'PUT', 'DELETE'])    
+def each_note(note_id):
+    if request.method == "GET":
+        note_obj = fetch_db(note_id)
+        if note_obj:
+            return make_response(jsonify(note_obj),200)
+        else:
+            return make_response(jsonify(note_obj),404)
 
-class NoteList(Resource):
-    def get(self):
-        titles = Note.query.all()
-        database = {}
-        for title in titles:
-            database[title.id] = {"title":title.title, "description":title.description, "date":title.date}
-        return database
+    elif request.method == "PUT":
+        content = request.json
+        table.update(content, ['id'])
+        note_obj = fetch_db(note_id)
+        return make_response(jsonify(note_obj), 200)
 
-class Note(Resource):
-    @marshal_with(resource_fields)
-    def post(self, id):
-        args = note_post_args.parse_args()
-        title = Note.query.filter_by(id=id).first()
-        if title:
-            abort(409, message="Note id taken.")
-
-        result = Note(id=id, title=args['title'], description=args['description'], date=args['date'])
-        db.session.add(result)
-        db.session.commit()
-        return result, 201
-
-api.add_resource(Note,'/notes/<int:id>')
-api.add_resource(NoteList, '/notes')
+    elif request.method == "DELETE":
+        table.delete(id=note_id)
+        return make_response(jsonify({}),204)
 
 
 if __name__ == "__main__":
