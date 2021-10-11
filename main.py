@@ -22,12 +22,12 @@ def populate():
     table.insert({
         "title": "A Song of Ice and Fire",
         "description": "A good old book",
-        "date": "Out 9 2021"
+        "date": "10/9/2021"
     })
     table.insert({
         "title": "Food",
         "description": "Pizza",
-        "date": "Out 8 2021"
+        "date": "10/8/2021"
     })
     return make_response(jsonify(fetch_db_all()),200)
 
@@ -38,7 +38,7 @@ def notes():
     elif request.method == "POST":
         content = request.json
         table.insert(content)
-        note_id = content['id']
+        note_id = table.find(content['id'])
         return make_response(jsonify(fetch_db(note_id)), 201)
 
 @app.route('/notes/<note_id>', methods=['GET', 'PUT', 'DELETE'])    
