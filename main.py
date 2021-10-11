@@ -37,8 +37,7 @@ def notes():
         return make_response(jsonify(fetch_db_all()),200)
     elif request.method == "POST":
         content = request.json
-        table.insert(content)
-        note_id = table.find(content['id'])
+        note_id = table.insert(content)
         return make_response(jsonify(fetch_db(note_id)), 201)
 
 @app.route('/notes/<note_id>', methods=['GET', 'PUT', 'DELETE'])    
