@@ -17,6 +17,10 @@ def fetch_db_all():
         notes.append(note)
     return notes
 
+@app.route('/', methods=['GET'])
+def hello():
+    return {"hello": "hello world"}
+
 @app.route('/populate', methods=['GET'])
 def populate():
     table.insert({
