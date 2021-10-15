@@ -62,7 +62,3 @@ def each_note(note_id):
     elif request.method == "DELETE":
         table.delete(id=note_id)
         return make_response(jsonify({}),204)
-
-
-if __name__ == "__main__":
-    app.run(debug=False)
